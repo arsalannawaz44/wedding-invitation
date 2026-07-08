@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arsalan &amp; Tehreem — A Royal Wedding Invitation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Floating petals -->
+  <div class="petals" aria-hidden="true"></div>
+
+  <!-- Sound toggle -->
+  <button id="sound-toggle" class="sound-toggle" title="Toggle music" aria-label="Toggle music">
+    <span class="sound-toggle__icon">♪</span>
+  </button>
+
+  <audio id="bg-music" loop preload="auto">
+    <source src="assets/aaj-sajeya.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="fireworks-sfx" preload="auto">
+    <source src="assets/fireworks.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- ===== Kraft Envelope Welcome ===== -->
+  <div id="welcome" class="welcome">
+    <canvas id="welcome-sparkles" class="welcome__sparkles"></canvas>
+
+    <div class="env-scene">
+      <div class="env" id="env">
+        <!-- Card that slides out -->
+        <div class="env__card" id="env-card">
+          <div class="env__card-corner env__card-corner--tl"></div>
+          <div class="env__card-corner env__card-corner--br"></div>
+          <p class="env__card-invited">You're Invited</p>
+          <div class="env__card-mono"></div>
+          <h1 class="env__card-names">Arsalan <em>&amp;</em> Tehreem</h1>
+          <div class="env__card-rule"><span>◆</span></div>
+          <p class="env__card-date">19 &amp; 20 July 2026 · Karachi</p>
+        </div>
+
+        <!-- Kraft envelope pocket + folds -->
+        <div class="env__pocket"></div>
+        <div class="env__tri env__tri--left"></div>
+        <div class="env__tri env__tri--right"></div>
+        <div class="env__tri env__tri--bottom"></div>
+        <div class="env__seams"></div>
+
+        <!-- Top flap (slides up off screen) -->
+        <div class="env__flap" id="env-flap"></div>
+
+        <!-- "love" wax seal sits on top, at the center where the folds meet -->
+        <div class="env__seal"></div>
+      </div>
+      <p class="env__hint" id="env-hint">Tap to open</p>
+    </div>
+  </div>
+
+  <!-- Reminder toast -->
+  <div id="reminder-toast" class="reminder-toast">
+    <span class="reminder-toast__icon">🔔</span>
+    <div>
+      <strong>Valima reminder added</strong>
+      <small>Check your downloads — opens in your calendar with a 7:00 PM, 20 July alert</small>
+    </div>
+  </div>
+
+  <!-- ===== Main content ===== -->
+  <main id="main" class="main hidden">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero__corner hero__corner--tl"></div>
+      <div class="hero__corner hero__corner--tr"></div>
+      <div class="hero__corner hero__corner--bl"></div>
+      <div class="hero__corner hero__corner--br"></div>
+      <div class="hero__monogram"></div>
+      <p class="hero__bismillah">In the Name of Allah, the Most Beneficent &amp; the Most Merciful</p>
+      <h1 class="hero__couple">
+        <span>Arsalan</span>
+        <em>&amp;</em>
+        <span>Tehreem</span>
+      </h1>
+      <div class="hero__divider"><span>◆</span></div>
+      <p class="hero__tagline">Together with their families, request the honour of your presence as they begin their journey of a lifetime</p>
+      <div class="hero__scroll">
+        <span>Scroll to explore</span>
+        <div class="hero__scroll-icon"></div>
+      </div>
+    </section>
+
+    <!-- Countdown -->
+    <section class="countdown-section">
+      <h2 class="section-title">Counting Down to Forever</h2>
+      <div class="countdown-tabs">
+        <button class="countdown-tab active" data-target="ceremony">Wedding Ceremony</button>
+        <button class="countdown-tab" data-target="valima">Valima Reception</button>
+      </div>
+      <div id="countdown-ceremony" class="countdown active">
+        <div class="countdown__unit"><span id="cd-days-c">00</span><small>Days</small></div>
+        <div class="countdown__unit"><span id="cd-hours-c">00</span><small>Hours</small></div>
+        <div class="countdown__unit"><span id="cd-mins-c">00</span><small>Minutes</small></div>
+        <div class="countdown__unit"><span id="cd-secs-c">00</span><small>Seconds</small></div>
+      </div>
+      <div id="countdown-valima" class="countdown">
+        <div class="countdown__unit"><span id="cd-days-v">00</span><small>Days</small></div>
+        <div class="countdown__unit"><span id="cd-hours-v">00</span><small>Hours</small></div>
+        <div class="countdown__unit"><span id="cd-mins-v">00</span><small>Minutes</small></div>
+        <div class="countdown__unit"><span id="cd-secs-v">00</span><small>Seconds</small></div>
+      </div>
+      <p class="countdown__date" id="countdown-date">Sunday, 19th July 2026</p>
+    </section>
+
+    <!-- Invitations -->
+    <section class="invitations">
+      <h2 class="section-title">Our Celebrations</h2>
+
+      <!-- Wedding Ceremony -->
+      <article class="invite-card invite-card--ceremony" id="ceremony">
+        <div class="invite-card__corner invite-card__corner--tl"></div>
+        <div class="invite-card__inner">
+          <p class="invite-card__hosts">Mr. &amp; Mrs. Safdar Nawaz</p>
+          <p class="invite-card__request">Request the honour of your presence &amp; blessings at the</p>
+          <h3 class="invite-card__event">Wedding Ceremony</h3>
+          <p class="invite-card__relation">of their beloved son</p>
+          <p class="invite-card__name">Arsalan Nawaz</p>
+          <p class="invite-card__with">with</p>
+          <p class="invite-card__name">Tehreem Akbar</p>
+          <p class="invite-card__parentage">D/O. M. Akbar Sadozai</p>
+          <p class="invite-card__insha">Insha Allah on</p>
+          <p class="invite-card__datetime">Sunday &nbsp;|&nbsp; 19th &nbsp;|&nbsp; July 2026</p>
+          <div class="invite-card__venue invite-card__venue--primehouse">
+            <span class="venue-badge">Updated Venue</span>
+            <h4>Prime House</h4>
+            <p>Place of Elegant Events</p>
+            <p>4-E 11/3, Nazimabad, Karachi</p>
+          </div>
+          <div class="invite-card__programme">
+            <span>Programme</span>
+            <strong>Departure of Barat — 08:00 PM</strong>
+          </div>
+          <p class="invite-card__welcome">Awaiting to welcome: All Family Members</p>
+        </div>
+      </article>
+
+      <!-- Valima -->
+      <article class="invite-card invite-card--valima" id="valima">
+        <div class="invite-card__corner invite-card__corner--tl"></div>
+        <div class="invite-card__inner">
+          <p class="invite-card__hosts">Mr. &amp; Mrs. Safdar Nawaz</p>
+          <p class="invite-card__request">Request the honour of your presence &amp; blessings at the</p>
+          <h3 class="invite-card__event">Valima Reception</h3>
+          <p class="invite-card__relation">of their beloved son</p>
+          <p class="invite-card__name">Arsalan Nawaz</p>
+          <p class="invite-card__with">with</p>
+          <p class="invite-card__name">Tehreem Akbar</p>
+          <p class="invite-card__parentage">D/O. M. Akbar Sadozai</p>
+          <p class="invite-card__insha">Insha Allah on</p>
+          <p class="invite-card__datetime">Monday &nbsp;|&nbsp; 20th &nbsp;|&nbsp; July 2026</p>
+          <div class="invite-card__venue">
+            <h4>Iris Banquet</h4>
+            <p>D-2, Block-J, North Nazimabad, Karachi</p>
+          </div>
+          <div class="invite-card__schedule">
+            <div class="schedule-item">
+              <span class="schedule-icon">👥</span>
+              <div><small>Gathering</small><strong>09:00 PM</strong></div>
+            </div>
+            <div class="schedule-item">
+              <span class="schedule-icon">🍽️</span>
+              <div><small>Dinner</small><strong>10:00 PM</strong></div>
+            </div>
+          </div>
+          <div class="reminder-box">
+            <button class="reminder-btn" id="valima-reminder">🔔 Set Valima Reminder — 7:00 PM, 20 July</button>
+            <a class="reminder-google" id="valima-google" target="_blank" rel="noopener">or add to Google Calendar</a>
+          </div>
+          <div class="invite-card__contacts">
+            <p>Awaiting to welcome: All Family Members</p>
+            <a href="tel:+923332565153">Asif Nawaz — 0333-2565153</a>
+            <a href="tel:+923002052804">Kashif Nawaz — 0300-2052804</a>
+            <a href="tel:+923332565154">Aamir Nawaz — 0333-2565154</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Scratch card surprise -->
+    <section class="scratch-section">
+      <h2 class="section-title">A Little Surprise</h2>
+      <p class="scratch-section__hint">Scratch the golden card to reveal a special blessing for the couple</p>
+      <div class="scratch-wrapper">
+        <div class="scratch-reveal">
+          <div class="scratch-reveal__content">
+            <span class="scratch-reveal__emoji">💐</span>
+            <p class="scratch-reveal__quote">"And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them, and He has put love and mercy between your hearts."</p>
+            <p class="scratch-reveal__ref">— Quran 30:21</p>
+            <p class="scratch-reveal__wish">Wishing Arsalan &amp; Tehreem a lifetime of love, laughter &amp; barakah!</p>
+          </div>
+          <canvas id="scratch-canvas" class="scratch-canvas"></canvas>
+        </div>
+        <button id="scratch-reset" class="scratch-reset hidden">Scratch Again</button>
+      </div>
+    </section>
+
+    <!-- Venues / Maps -->
+    <section class="venue-section">
+      <h2 class="section-title">Find Your Way</h2>
+
+      <!-- Prime House -->
+      <div class="venue-card">
+        <div class="venue-card__brand venue-card__brand--prime">
+          <h3>Prime House</h3>
+          <span class="venue-card__tagline">Place of Elegant Events</span>
+          <span class="venue-card__event-label">Wedding Ceremony · 19 July</span>
+        </div>
+        <div class="venue-card__details">
+          <p>📍 4-E 11/3, Nazimabad, Karachi</p>
+          <p>📞 Tel: 021-36684462</p>
+          <p><a data-external href="https://wa.me/923128111543">💬 Waqar Ahmed — 0312-8111543</a></p>
+        </div>
+        <div class="venue-card__map">
+          <iframe
+            title="Prime House, Nazimabad Karachi"
+            src="https://maps.google.com/maps?q=4-E+11%2F3+Nazimabad+Karachi+Prime+House&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%" height="300" style="border:0;" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <a class="venue-card__map-link" data-external
+             href="https://www.google.com/maps/search/?api=1&query=Prime%20House%204-E%2011%2F3%20Nazimabad%20Karachi"
+             aria-label="Open Prime House in Google Maps"></a>
+        </div>
+        <a class="venue-card__directions" data-external href="https://www.google.com/maps/dir/?api=1&destination=Prime%20House%204-E%2011%2F3%20Nazimabad%20Karachi">Get Directions →</a>
+      </div>
+
+      <!-- Iris Banquet -->
+      <div class="venue-card">
+        <div class="venue-card__brand venue-card__brand--iris">
+          <h3>Iris Banquet</h3>
+          <span class="venue-card__tagline">Valima Reception</span>
+          <span class="venue-card__event-label">20 July · Gathering 9:00 PM</span>
+        </div>
+        <div class="venue-card__details">
+          <p>📍 D-2, Block-J, North Nazimabad, Karachi</p>
+        </div>
+        <div class="venue-card__map">
+          <iframe
+            title="Iris Banquet, North Nazimabad Karachi"
+            src="https://maps.google.com/maps?q=Iris+Banquet+D-2+Block+J+North+Nazimabad+Karachi&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%" height="300" style="border:0;" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <a class="venue-card__map-link" data-external
+             href="https://www.google.com/maps/search/?api=1&query=Iris%20Banquet%20Block%20J%20North%20Nazimabad%20Karachi"
+             aria-label="Open Iris Banquet in Google Maps"></a>
+        </div>
+        <a class="venue-card__directions" data-external href="https://www.google.com/maps/dir/?api=1&destination=Iris%20Banquet%20Block%20J%20North%20Nazimabad%20Karachi">Get Directions →</a>
+      </div>
+    </section>
+
+    <!-- Finale -->
+    <footer class="footer" id="finale">
+      <canvas id="fireworks" class="fireworks-canvas"></canvas>
+      <div class="footer__inner">
+        <div class="footer__monogram"></div>
+        <p class="footer__names">Arsalan <em>&amp;</em> Tehreem</p>
+        <p class="footer__date">19 &amp; 20 July 2026 · Karachi</p>
+        <p class="footer__dua">May Allah bless this union with love, mercy &amp; barakah</p>
+        <button id="celebrate-btn" class="celebrate-btn">Celebrate with us ✨</button>
+      </div>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

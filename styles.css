@@ -1,0 +1,471 @@
+/* ===== Variables ===== */
+:root {
+  --burgundy: #6b1d3a;
+  --burgundy-dark: #4a1228;
+  --burgundy-deep: #3a0e1f;
+  --gold: #c9a84c;
+  --gold-light: #e8d5a3;
+  --gold-shine: #f5eccf;
+  --blush: #f5d5d0;
+  --rose: #d4848a;
+  --sage: #8fa88b;
+  --cream: #faf6ee;
+  --ink: #2c1810;
+  --prime-green: #c5e86c;
+  --prime-red: #c41e3a;
+  --prime-blue: #1a3a6b;
+  --iris-purple: #6a4c93;
+  --font-script: 'Great Vibes', cursive;
+  --font-serif: 'Cinzel', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-sans: 'Lato', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+
+/* ===== Floating Petals ===== */
+.petals { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+.petal {
+  position: absolute; top: -20px; width: 12px; height: 12px;
+  background: var(--rose); border-radius: 50% 0 50% 50%;
+  opacity: 0.5; animation: fall linear infinite;
+}
+.petal:nth-child(odd) { background: var(--blush); width: 8px; height: 8px; }
+.petal:nth-child(3n) { background: var(--gold-light); }
+@keyframes fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== Sound toggle ===== */
+.sound-toggle {
+  position: fixed; top: 1rem; right: 1rem; z-index: 1100;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  background: rgba(58, 14, 31, 0.75); color: var(--gold-light);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); transition: transform 0.3s, background 0.3s;
+}
+.sound-toggle:hover { transform: scale(1.1); }
+.sound-toggle__icon { font-size: 1.1rem; line-height: 1; }
+.sound-toggle.muted { opacity: 0.55; }
+.sound-toggle.playing .sound-toggle__icon { animation: notePulse 1.2s ease-in-out infinite; }
+@keyframes notePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* ===== Full-Screen Envelope Welcome ===== */
+.welcome {
+  position: fixed; inset: 0; z-index: 1000; overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(107,29,58,0.55) 0%, transparent 60%),
+    linear-gradient(160deg, #2a0e18 0%, #1a0a10 60%, #0f0508 100%);
+  transition: opacity 1s ease, visibility 1s ease;
+  cursor: pointer;
+  perspective: 1600px;
+}
+.welcome.done { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.welcome__sparkles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+/* Envelope fills the whole screen */
+.env-scene { position: absolute; inset: 0; z-index: 2; }
+.env { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+/* Kraft envelope base (pocket behind the card) */
+.env__pocket {
+  position: absolute; inset: 0; z-index: 1;
+  background: url('assets/kraft-paper.png') center/cover;
+  filter: brightness(0.82);
+  transition: opacity 0.8s ease 1.7s;
+}
+.env.open .env__pocket { opacity: 0; }
+
+/* Kraft folds (left / right / bottom triangles) — slide off screen on open */
+.env__tri {
+  position: absolute; inset: 0; z-index: 3;
+  background: url('assets/kraft-paper.png') center/cover;
+  transition: transform 1.5s cubic-bezier(0.5, 0, 0.35, 1) 0.7s;
+}
+.env__tri--left {
+  clip-path: polygon(0 0, 0 100%, 50% 50%);
+  filter: brightness(0.9);
+}
+.env__tri--right {
+  clip-path: polygon(100% 0, 100% 100%, 50% 50%);
+  filter: brightness(0.86);
+  background-position: right center;
+}
+.env__tri--bottom {
+  clip-path: polygon(0 100%, 100% 100%, 50% 50%);
+  filter: brightness(0.78);
+  background-position: bottom center;
+}
+.env.open .env__tri--left { transform: translateY(115%); }
+.env.open .env__tri--right { transform: translateY(115%); }
+.env.open .env__tri--bottom { transform: translateY(115%); }
+
+/* Diagonal crease shadows (the envelope X) */
+.env__seams {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 1.5px), rgba(60,35,10,0.28) 50%, transparent calc(50% + 1.5px)),
+    linear-gradient(to bottom left, transparent calc(50% - 1.5px), rgba(60,35,10,0.28) 50%, transparent calc(50% + 1.5px)),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.12) 0%, transparent 22%);
+  transition: opacity 0.7s ease 0.7s;
+}
+.env.open .env__seams { opacity: 0; }
+
+/* Letter/card that sits behind the envelope and is revealed as the flaps slide off */
+.env__card {
+  position: absolute; left: 50%; top: 50%; z-index: 2;
+  width: min(90vw, 460px); height: min(74vh, 620px);
+  transform: translate(-50%, -50%) scale(0.97);
+  background: linear-gradient(160deg, #fffdf8 0%, #fbf3e4 100%);
+  border-radius: 6px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 2rem 1.5rem;
+  opacity: 1;
+  transition: transform 1s cubic-bezier(0.34, 1.3, 0.64, 1) 1.6s;
+}
+.env.open .env__card {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.env__card-corner {
+  position: absolute; width: clamp(70px, 20vw, 100px); aspect-ratio: 1;
+  background: url('assets/gold-corner.png') center/contain no-repeat; opacity: 0.85;
+}
+.env__card-corner--tl { top: 8px; left: 8px; }
+.env__card-corner--br { bottom: 8px; right: 8px; transform: scale(-1,-1); }
+.env__card-invited {
+  font-family: var(--font-serif); font-size: 0.65rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem;
+}
+.env__card-mono {
+  width: clamp(90px, 26vw, 130px); aspect-ratio: 1;
+  background: url('assets/monogram.png') center/contain no-repeat;
+  filter: drop-shadow(0 4px 12px rgba(107,29,58,0.3));
+}
+.env__card-names {
+  font-family: var(--font-script); font-size: clamp(2.2rem, 9vw, 3.2rem);
+  color: var(--gold); line-height: 1.1; margin-top: 0.3rem;
+}
+.env__card-names em { font-style: normal; font-family: var(--font-serif); font-size: 0.36em; color: var(--burgundy); }
+.env__card-rule { color: var(--gold); font-size: 0.65rem; letter-spacing: 0.4em; margin: 0.6rem 0; }
+.env__card-date {
+  font-family: var(--font-serif); font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--burgundy); opacity: 0.85;
+}
+
+/* Top flap (top triangle) — slides up off screen on open */
+.env__flap {
+  position: absolute; inset: 0; z-index: 5;
+  background: url('assets/kraft-paper.png') top center/cover;
+  filter: brightness(0.97);
+  clip-path: polygon(0 0, 100% 0, 50% 50%);
+  transition: transform 1.5s cubic-bezier(0.5, 0, 0.35, 1) 0.7s;
+}
+.env__flap::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(60,35,10,0.22) 100%);
+  clip-path: inherit;
+}
+.env.open .env__flap { transform: translateY(-115%); }
+
+/* "love" wax seal, sits on top at the center — slides up with the flap */
+.env__seal {
+  position: absolute; top: 50%; left: 50%; z-index: 7;
+  width: clamp(120px, 32vw, 190px); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: url('assets/wax-love.png') center/contain no-repeat;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+  transition: transform 1.5s cubic-bezier(0.5, 0, 0.35, 1) 0.7s, opacity 0.9s ease 1s;
+}
+.env.open .env__seal { opacity: 0; transform: translate(-50%, -50%) translateY(-115vh); }
+
+.env__hint {
+  position: absolute; bottom: 8%; left: 0; right: 0; text-align: center; z-index: 7;
+  font-family: var(--font-serif); font-size: 0.72rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: rgba(255,230,180,0.9);
+  animation: pulse 2s ease-in-out infinite; transition: opacity 0.4s;
+}
+.env.open ~ .env__hint { opacity: 0; }
+
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* ===== Main ===== */
+.main { position: relative; z-index: 1; animation: fadeUp 1s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-title {
+  font-family: var(--font-serif); font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--burgundy); text-align: center; margin-bottom: 2rem; position: relative;
+}
+.section-title::after {
+  content: '❦'; display: block; color: var(--gold);
+  font-size: 1rem; margin-top: 0.5rem; letter-spacing: 0;
+}
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 4rem 1.5rem; position: relative;
+  background:
+    linear-gradient(rgba(250,246,238,0.92), rgba(250,246,238,0.96)),
+    url('assets/royal-damask.png') center/cover fixed;
+}
+.hero__corner {
+  position: absolute; width: clamp(90px, 22vw, 170px); aspect-ratio: 1;
+  background: url('assets/gold-corner.png') center/contain no-repeat;
+  opacity: 0.9; pointer-events: none;
+}
+.hero__corner--tl { top: 0; left: 0; }
+.hero__corner--tr { top: 0; right: 0; transform: scaleX(-1); }
+.hero__corner--bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.hero__corner--br { bottom: 0; right: 0; transform: scale(-1, -1); }
+
+.hero__monogram {
+  width: clamp(100px, 24vw, 150px); aspect-ratio: 1;
+  background: url('assets/monogram.png') center/contain no-repeat;
+  margin-bottom: 1.5rem; filter: drop-shadow(0 4px 16px rgba(107,29,58,0.25));
+  animation: floatY 4s ease-in-out infinite;
+}
+.hero__bismillah {
+  font-family: var(--font-serif); font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--burgundy); opacity: 0.85;
+  margin-bottom: 1.5rem; max-width: 400px; line-height: 1.8;
+}
+.hero__couple {
+  font-family: var(--font-script); font-size: clamp(3rem, 12vw, 6rem);
+  color: var(--gold); line-height: 1.15; text-shadow: 0 2px 14px rgba(201,168,76,0.25);
+}
+.hero__couple em {
+  font-style: normal; font-size: 0.42em; display: block; color: var(--burgundy);
+  font-family: var(--font-serif); letter-spacing: 0.3em;
+}
+.hero__divider { color: var(--gold); font-size: 0.7rem; margin: 1rem 0; letter-spacing: 0.5em; }
+.hero__tagline {
+  font-family: var(--font-body); font-size: 1.15rem; color: #5a4a42;
+  max-width: 420px; line-height: 1.7; margin-bottom: 3rem; font-style: italic;
+}
+.hero__scroll {
+  position: absolute; bottom: 2rem; display: flex; flex-direction: column;
+  align-items: center; gap: 0.5rem; font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--burgundy); opacity: 0.6;
+}
+.hero__scroll-icon { width: 20px; height: 32px; border: 2px solid var(--burgundy); border-radius: 10px; position: relative; }
+.hero__scroll-icon::after {
+  content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 8px; background: var(--burgundy); border-radius: 2px;
+  animation: scrollBounce 1.5s ease-in-out infinite;
+}
+@keyframes scrollBounce {
+  0%,100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  50% { transform: translateX(-50%) translateY(8px); opacity: 0.3; }
+}
+
+/* ===== Countdown ===== */
+.countdown-section {
+  padding: 4rem 1.5rem; text-align: center;
+  background: linear-gradient(135deg, var(--burgundy-deep) 0%, var(--burgundy) 100%);
+  color: var(--gold-light); position: relative; overflow: hidden;
+}
+.countdown-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('assets/royal-damask.png') center/cover; opacity: 0.12;
+}
+.countdown-section .section-title { color: var(--gold-light); position: relative; }
+.countdown-tabs { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; position: relative; }
+.countdown-tab {
+  font-family: var(--font-serif); font-size: 0.68rem; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.6rem 1.2rem; border: 1px solid var(--gold);
+  background: transparent; color: var(--gold-light); cursor: pointer; transition: all 0.3s;
+}
+.countdown-tab.active, .countdown-tab:hover { background: var(--gold); color: var(--burgundy-deep); }
+.countdown { display: none; justify-content: center; gap: clamp(0.75rem, 3vw, 1.75rem); margin-bottom: 1.5rem; position: relative; }
+.countdown.active { display: flex; }
+.countdown__unit {
+  display: flex; flex-direction: column; align-items: center; min-width: 72px;
+  padding: 1rem 0.5rem; border: 1px solid rgba(201,168,76,0.35); border-radius: 4px;
+  background: rgba(0,0,0,0.15);
+}
+.countdown__unit span {
+  font-family: var(--font-serif); font-size: clamp(2rem, 6vw, 3rem); font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-shine) 50%, var(--gold) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.countdown__unit small { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.5rem; opacity: 0.8; }
+.countdown__date { font-family: var(--font-serif); font-size: 0.85rem; letter-spacing: 0.1em; opacity: 0.8; position: relative; }
+
+/* ===== Invitation Cards ===== */
+.invitations { padding: 4rem 1.5rem; max-width: 680px; margin: 0 auto; }
+.invite-card {
+  position: relative; background: var(--cream); border: 1px solid rgba(201,168,76,0.4);
+  margin-bottom: 3rem; overflow: hidden;
+  box-shadow: 0 10px 40px rgba(107,29,58,0.12);
+  animation: cardReveal 0.8s ease both;
+  outline: 1px solid rgba(201,168,76,0.25); outline-offset: -8px;
+}
+@keyframes cardReveal { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+.invite-card__corner {
+  position: absolute; width: 120px; aspect-ratio: 1;
+  background: url('assets/gold-corner.png') center/contain no-repeat; opacity: 0.85;
+}
+.invite-card__corner--tl { top: 0; left: 0; }
+.invite-card__inner { padding: 3rem 2rem 2.5rem; text-align: center; position: relative; }
+.invite-card__hosts { font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 1rem; }
+.invite-card__request { font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; margin-bottom: 0.75rem; font-style: italic; color: #5a4a42; }
+.invite-card__event { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 1rem; text-transform: uppercase; }
+.invite-card__relation { font-family: var(--font-body); font-size: 0.95rem; font-style: italic; margin-bottom: 0.5rem; color: #5a4a42; }
+.invite-card__name { font-family: var(--font-script); font-size: clamp(2rem, 6vw, 2.8rem); color: var(--gold); line-height: 1.3; }
+.invite-card__with { font-family: var(--font-serif); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0.25rem 0; }
+.invite-card__parentage { font-family: var(--font-serif); font-size: 0.65rem; letter-spacing: 0.1em; margin-bottom: 1.5rem; }
+.invite-card__insha { font-family: var(--font-serif); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.25rem; }
+.invite-card__datetime { font-family: var(--font-serif); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 1.5rem; }
+.invite-card__venue { padding: 1.25rem; margin: 1rem 0; border-top: 1px solid rgba(201,168,76,0.35); border-bottom: 1px solid rgba(201,168,76,0.35); }
+.invite-card__venue h4 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 0.25rem; }
+.invite-card__venue p { font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; }
+.invite-card__venue--primehouse {
+  background: linear-gradient(135deg, rgba(197,232,108,0.18) 0%, rgba(197,232,108,0.06) 100%);
+  border: 2px solid var(--prime-green); border-radius: 4px; position: relative;
+}
+.invite-card__venue--primehouse h4 { font-family: var(--font-script); font-size: 1.9rem; color: var(--prime-red); text-shadow: 1px 1px 0 white, -1px -1px 0 white; }
+.venue-badge {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--prime-red); color: white; font-size: 0.55rem; letter-spacing: 0.15em;
+  text-transform: uppercase; padding: 0.2rem 0.8rem; border-radius: 2px;
+}
+.invite-card__programme { margin-top: 1rem; font-family: var(--font-serif); font-size: 0.7rem; letter-spacing: 0.08em; }
+.invite-card__programme span { display: block; text-transform: uppercase; margin-bottom: 0.25rem; color: #888; }
+.invite-card__welcome { font-family: var(--font-serif); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1.5rem; color: #666; }
+.invite-card__schedule { display: flex; justify-content: center; gap: 2rem; margin: 1.5rem 0; }
+.schedule-item { display: flex; align-items: center; gap: 0.5rem; text-align: left; }
+.schedule-icon { font-size: 1.5rem; }
+.schedule-item small { display: block; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+.schedule-item strong { font-family: var(--font-serif); font-size: 0.8rem; letter-spacing: 0.05em; }
+.reminder-toast {
+  position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%) translateY(140%);
+  z-index: 1200; max-width: 88vw; width: 380px;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.9rem 1.1rem; border-radius: 10px;
+  background: linear-gradient(135deg, #6b1d3a 0%, #4a1228 100%);
+  color: #fbeecb; box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  border: 1px solid rgba(201,168,76,0.5);
+  opacity: 0; transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.5s ease;
+}
+.reminder-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.reminder-toast__icon { font-size: 1.5rem; }
+.reminder-toast strong { display: block; font-family: var(--font-serif); font-size: 0.8rem; letter-spacing: 0.05em; }
+.reminder-toast small { display: block; font-size: 0.72rem; opacity: 0.85; margin-top: 0.15rem; line-height: 1.4; }
+
+.reminder-box { margin: 1.25rem 0 0.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.reminder-btn {
+  font-family: var(--font-serif); font-size: 0.7rem; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 0.75rem 1.4rem; cursor: pointer;
+  color: var(--burgundy-deep); border: none; border-radius: 3px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-shine) 50%, var(--gold) 100%);
+  box-shadow: 0 4px 16px rgba(201,168,76,0.4); transition: transform 0.25s, box-shadow 0.25s;
+}
+.reminder-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(201,168,76,0.55); }
+.reminder-btn--done { background: linear-gradient(135deg, #7fae7f, #a9d0a9); color: #143d14; }
+.reminder-google {
+  font-family: var(--font-body); font-size: 0.9rem; font-style: italic;
+  color: var(--burgundy); text-decoration: underline; text-underline-offset: 2px;
+}
+.reminder-google:hover { color: var(--gold); }
+
+.invite-card__contacts { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.08); }
+.invite-card__contacts p { font-family: var(--font-serif); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem; color: #666; }
+.invite-card__contacts a { display: block; font-size: 0.85rem; color: var(--burgundy); text-decoration: none; margin-bottom: 0.35rem; transition: color 0.2s; }
+.invite-card__contacts a:hover { color: var(--gold); }
+
+/* ===== Scratch Card ===== */
+.scratch-section { padding: 4rem 1.5rem; background: var(--cream); text-align: center; }
+.scratch-section__hint { font-family: var(--font-body); font-size: 1.05rem; font-style: italic; color: #6a5a52; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+.scratch-wrapper { max-width: 400px; margin: 0 auto; }
+.scratch-reveal { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(107,29,58,0.18); border: 2px solid var(--gold); }
+.scratch-reveal__content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 50%, #fff9f0 100%); }
+.scratch-reveal__emoji { font-size: 2rem; margin-bottom: 0.75rem; }
+.scratch-reveal__quote { font-family: var(--font-body); font-size: 1.05rem; line-height: 1.6; font-style: italic; color: var(--burgundy); margin-bottom: 0.5rem; }
+.scratch-reveal__ref { font-size: 0.7rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.05em; }
+.scratch-reveal__wish { font-family: var(--font-script); font-size: 1.4rem; color: var(--gold); }
+.scratch-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+.scratch-reset { margin-top: 1rem; font-family: var(--font-serif); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.5rem; border: 1px solid var(--burgundy); background: transparent; color: var(--burgundy); cursor: pointer; transition: all 0.3s; }
+.scratch-reset:hover { background: var(--burgundy); color: white; }
+
+/* ===== Venues / Maps ===== */
+.venue-section { padding: 4rem 1.5rem; background: linear-gradient(180deg, var(--cream) 0%, #f0e9dd 100%); }
+.venue-card { max-width: 600px; margin: 0 auto 2.5rem; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1); background: white; border: 1px solid rgba(201,168,76,0.3); }
+.venue-card__brand { padding: 1.5rem; text-align: center; }
+.venue-card__brand--prime { background: var(--prime-green); }
+.venue-card__brand--iris { background: linear-gradient(135deg, var(--iris-purple) 0%, #8a6db5 100%); }
+.venue-card__brand h3 { font-family: var(--font-script); font-size: 2.5rem; }
+.venue-card__brand--prime h3 { color: var(--prime-red); text-shadow: 2px 2px 0 white, -1px -1px 0 white; }
+.venue-card__brand--iris h3 { color: white; text-shadow: 1px 1px 6px rgba(0,0,0,0.3); }
+.venue-card__tagline { display: inline-block; font-family: var(--font-script); font-size: 1rem; padding: 0.2rem 1rem; border-radius: 4px; margin-top: 0.25rem; }
+.venue-card__brand--prime .venue-card__tagline { background: #f5d742; color: var(--prime-blue); }
+.venue-card__brand--iris .venue-card__tagline { background: rgba(255,255,255,0.2); color: white; }
+.venue-card__event-label { display: block; font-family: var(--font-serif); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.6rem; opacity: 0.85; }
+.venue-card__brand--prime .venue-card__event-label { color: var(--prime-blue); }
+.venue-card__brand--iris .venue-card__event-label { color: white; }
+.venue-card__details { padding: 1.25rem 1.5rem; text-align: center; }
+.venue-card__details p { font-family: var(--font-body); font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--ink); }
+.venue-card__details a { color: var(--burgundy); text-decoration: none; }
+.venue-card__details a:hover { text-decoration: underline; }
+.venue-card__map { line-height: 0; position: relative; }
+.venue-card__map iframe { display: block; filter: grayscale(0.1) contrast(1.05); pointer-events: none; }
+.venue-card__map-link { position: absolute; inset: 0; z-index: 2; display: block; cursor: pointer; }
+.venue-card__directions { display: block; text-align: center; padding: 1rem; background: var(--burgundy); color: white; font-family: var(--font-serif); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background 0.3s; }
+.venue-card__directions:hover { background: var(--burgundy-dark); }
+
+/* ===== Finale / Footer ===== */
+.footer {
+  position: relative; padding: 4rem 1.5rem; text-align: center;
+  background: linear-gradient(135deg, var(--burgundy-deep) 0%, var(--burgundy) 60%, var(--burgundy-dark) 100%);
+  color: white; overflow: hidden;
+}
+.fireworks-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.footer__inner { position: relative; z-index: 2; }
+.footer__monogram { width: 110px; aspect-ratio: 1; margin: 0 auto 1rem; background: url('assets/monogram.png') center/contain no-repeat; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5)); }
+.footer__names { font-family: var(--font-script); font-size: 2.4rem; color: var(--gold-light); margin-bottom: 0.25rem; }
+.footer__names em { font-style: normal; font-family: var(--font-serif); font-size: 0.5em; }
+.footer__date { font-family: var(--font-serif); font-size: 0.75rem; letter-spacing: 0.2em; opacity: 0.75; margin-bottom: 0.75rem; }
+.footer__dua { font-family: var(--font-body); font-size: 1.1rem; font-style: italic; color: var(--gold-light); opacity: 0.9; max-width: 400px; margin: 0 auto 1.5rem; }
+.celebrate-btn {
+  font-family: var(--font-serif); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.8rem 2rem; color: var(--burgundy-deep);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-shine) 50%, var(--gold) 100%);
+  border: none; border-radius: 2px; cursor: pointer; box-shadow: 0 6px 24px rgba(201,168,76,0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.celebrate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(201,168,76,0.6); }
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .invite-card__inner { padding: 2.5rem 1.25rem 2rem; }
+  .invite-card__schedule { flex-direction: column; align-items: center; gap: 1rem; }
+  .countdown__unit { min-width: 62px; padding: 0.75rem 0.35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
