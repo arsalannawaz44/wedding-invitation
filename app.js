@@ -198,18 +198,20 @@ function openEnvelope() {
   startMusicIfNeeded();
   if (envHint) envHint.textContent = '';
 
-  // Auto-add the Valima reminder to the guest's calendar on open.
-  // (The opening tap is a user gesture, so the download is allowed.)
-  Reminder.download();
-  showReminderToast();
+  // Offer calendar reminder (Google Calendar on Android, picker for others)
+  setTimeout(() => Reminder.promptAfterOpen(), 1200);
 
   // Let the flaps slide off and reveal the card, then flow into the invitation
   setTimeout(enterInvitation, 3600);
 }
 
-function showReminderToast() {
+function showReminderToast(title, message) {
   const toast = document.getElementById('reminder-toast');
+  const titleEl = document.getElementById('reminder-toast-title');
+  const msgEl = document.getElementById('reminder-toast-msg');
   if (!toast) return;
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.textContent = message;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 6000);
 }
@@ -228,6 +230,91 @@ welcome.addEventListener('click', () => {
   if (!envOpened) openEnvelope();
   else if (!entered) enterInvitation();
 });
+
+/* ===== Envelope asset preloader ===== */
+(function envelopePreloader() {
+  const ASSETS = [
+    'assets/kraft-paper.png',
+    'assets/wax-love.png',
+    'assets/monogram.png',
+    'assets/gold-corner.png',
+  ];
+  const loader = document.getElementById('env-loader');
+  const scene = document.querySelector('.env-scene');
+  const envEl = document.getElementById('env');
+  let done = false;
+
+  function finish() {
+    if (done) return;
+    done = true;
+    if (envEl) envEl.classList.add('ready');
+    if (scene) scene.classList.add('ready');
+    if (loader) {
+      loader.classList.add('hide');
+      setTimeout(() => loader.remove(), 900);
+    }
+  }
+
+  let loaded = 0;
+  ASSETS.forEach((src) => {
+    const img = new Image();
+    const tick = () => { if (++loaded >= ASSETS.length) finish(); };
+    img.onload = tick;
+    img.onerror = tick;
+    img.src = src;
+  });
+
+  setTimeout(finish, 4500);
+})();
+
+/* Loader sparkle canvas */
+(function loaderSparkles() {
+  const canvas = document.getElementById('loader-sparkles');
+  const loader = document.getElementById('env-loader');
+  if (!canvas || !loader) return;
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  let rafId = null;
+
+  function size() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  size();
+
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random(), y: Math.random(),
+      r: 0.5 + Math.random() * 2.2,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.004 + Math.random() * 0.01,
+    });
+  }
+
+  function loop(now) {
+    if (!loader.parentElement) return;
+    const w = canvas.width, h = canvas.height;
+    const t = now / 1000;
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach((p) => {
+      p.y -= p.speed;
+      if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+      const sx = p.x * w + Math.sin(t * 1.5 + p.phase) * 10;
+      const sy = p.y * h;
+      const tw = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * 3 + p.phase));
+      const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, p.r * 6);
+      grad.addColorStop(0, `rgba(255,228,150,${tw})`);
+      grad.addColorStop(1, 'rgba(255,200,80,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(sx, sy, p.r * 6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    rafId = requestAnimationFrame(loop);
+  }
+  rafId = requestAnimationFrame(loop);
+  window.addEventListener('resize', size);
+})();
 
 /* Floating gold sparkles behind the envelope */
 (function welcomeSparkles() {
@@ -286,8 +373,9 @@ welcome.addEventListener('click', () => {
 
 /* ===== Add-to-Calendar Reminder (Valima) ===== */
 const Reminder = (function () {
-  // Valima: 20 July 2026, gathering 9:00 PM PKT (UTC+5). Reminder alarm at 7:00 PM PKT.
-  // PKT->UTC: 21:00 -> 16:00Z, 23:00 -> 18:00Z, 19:00 (alarm) -> 14:00Z
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -311,9 +399,37 @@ const Reminder = (function () {
     'END:VCALENDAR',
   ].join('\r\n');
 
-  let downloadedOnce = false;
+  const modal = document.getElementById('reminder-modal');
+  const backdrop = document.getElementById('reminder-modal-backdrop');
+  const googleBtn = document.getElementById('reminder-google-btn');
+  const icsBtn = document.getElementById('reminder-ics-btn');
+  const dismissBtn = document.getElementById('reminder-dismiss');
+  const mainBtn = document.getElementById('valima-reminder');
+  const hint = document.getElementById('reminder-hint');
 
-  function download() {
+  function googleUrl() {
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: 'Valima Reception — Arsalan & Tehreem',
+      dates: '20260720T160000Z/20260720T180000Z',
+      details: 'Valima Reception of Arsalan & Tehreem. Gathering 9:00 PM, Dinner 10:00 PM. Reminder: arrive by 7:00 PM.',
+      location: 'Iris Banquet, D-2, Block-J, North Nazimabad, Karachi',
+    });
+    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  }
+
+  function openGoogle() {
+    window.open(googleUrl(), 'weddingExternalTab');
+    showReminderToast(
+      'Opening Google Calendar',
+      'Tap Save to add the Valima reminder (7:00 PM alert).'
+    );
+    Sound.sparkle();
+    closeModal();
+    markButtonDone('✓ Opened in Google Calendar');
+  }
+
+  function downloadIcs() {
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -323,51 +439,88 @@ const Reminder = (function () {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    downloadedOnce = true;
+    showReminderToast(
+      'Calendar file saved',
+      isIOS
+        ? 'Open the downloaded file — tap Add to Calendar on your iPhone.'
+        : 'Open the .ics file in your calendar app.'
+    );
+    Sound.sparkle();
+    closeModal();
+    markButtonDone('✓ Reminder file saved');
   }
 
-  function googleUrl() {
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: 'Valima Reception — Arsalan & Tehreem',
-      dates: '20260720T160000Z/20260720T180000Z',
-      details: 'Valima Reception of Arsalan & Tehreem. Gathering 9:00 PM, Dinner 10:00 PM. (Reminder set for 7:00 PM)',
-      location: 'Iris Banquet, D-2, Block-J, North Nazimabad, Karachi',
-    });
-    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  function markButtonDone(label) {
+    if (!mainBtn) return;
+    const original = mainBtn.innerHTML;
+    mainBtn.innerHTML = label;
+    mainBtn.classList.add('reminder-btn--done');
+    setTimeout(() => {
+      mainBtn.innerHTML = original;
+      mainBtn.classList.remove('reminder-btn--done');
+    }, 4000);
   }
 
-  return { download, googleUrl };
-})();
+  function openModal() {
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
 
-/* Manual reminder button + Google link (single-tab, guarded) */
-(function wireReminderControls() {
-  const btn = document.getElementById('valima-reminder');
-  if (btn) {
-    btn.addEventListener('click', (e) => {
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function promptAfterOpen() {
+    if (isAndroid) {
+      openModal();
+      return;
+    }
+    showReminderToast(
+      'Don\u2019t miss the Valima',
+      'Tap the reminder button below to add it to your calendar.'
+    );
+  }
+
+  function handleMainButton() {
+    if (isAndroid) {
+      openModal();
+      return;
+    }
+    if (isIOS) {
+      openModal();
+      return;
+    }
+    openModal();
+  }
+
+  // Tailor labels for the guest's device
+  if (hint) {
+    hint.textContent = isAndroid
+      ? 'Recommended: Google Calendar on Android'
+      : isIOS
+        ? 'Google Calendar or Apple Calendar (.ics)'
+        : 'Google Calendar or download .ics file';
+  }
+  if (mainBtn && isAndroid) {
+    mainBtn.innerHTML = '🔔 Add Valima to Google Calendar — 7:00 PM';
+  }
+
+  if (googleBtn) googleBtn.addEventListener('click', openGoogle);
+  if (icsBtn) icsBtn.addEventListener('click', downloadIcs);
+  if (dismissBtn) dismissBtn.addEventListener('click', closeModal);
+  if (backdrop) backdrop.addEventListener('click', closeModal);
+  if (mainBtn) {
+    mainBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      Reminder.download();
-      Sound.sparkle();
-      const original = btn.innerHTML;
-      btn.innerHTML = '✓ Reminder Saved — 7:00 PM, 20 July';
-      btn.classList.add('reminder-btn--done');
-      setTimeout(() => {
-        btn.innerHTML = original;
-        btn.classList.remove('reminder-btn--done');
-      }, 3500);
+      handleMainButton();
     });
   }
 
-  const gcal = document.getElementById('valima-google');
-  if (gcal) {
-    gcal.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      // Named target => reuse the same tab instead of spawning a new one each click
-      window.open(Reminder.googleUrl(), 'weddingExternalTab');
-    });
-  }
+  return { openModal, openGoogle, downloadIcs, googleUrl, promptAfterOpen, isAndroid, isIOS };
 })();
 
 /* Single-tab guard for all external links (maps, directions, whatsapp) */

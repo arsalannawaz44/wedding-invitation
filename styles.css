@@ -81,8 +81,49 @@ body {
 
 .welcome__sparkles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
+/* ===== Envelope preloader (glitter) ===== */
+.env-loader {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(107,29,58,0.65) 0%, transparent 55%),
+    linear-gradient(160deg, #2a0e18 0%, #1a0a10 60%, #0f0508 100%);
+  transition: opacity 0.9s ease, visibility 0.9s ease;
+}
+.env-loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.env-loader__mono {
+  width: clamp(88px, 24vw, 120px); aspect-ratio: 1;
+  background: url('assets/monogram.png') center/contain no-repeat;
+  filter: drop-shadow(0 0 24px rgba(201,168,76,0.55));
+  animation: loaderPulse 2.2s ease-in-out infinite;
+}
+.env-loader__text {
+  margin-top: 1.4rem; font-family: var(--font-serif); font-size: 0.72rem;
+  letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,230,180,0.9);
+}
+.env-loader__dots { display: flex; gap: 0.45rem; margin-top: 0.85rem; }
+.env-loader__dots span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+  animation: loaderDot 1.2s ease-in-out infinite;
+}
+.env-loader__dots span:nth-child(2) { animation-delay: 0.2s; }
+.env-loader__dots span:nth-child(3) { animation-delay: 0.4s; }
+.env-loader__sparkles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+@keyframes loaderPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+@keyframes loaderDot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+
 /* Envelope fills the whole screen */
-.env-scene { position: absolute; inset: 0; z-index: 2; }
+.env-scene {
+  position: absolute; inset: 0; z-index: 2;
+  opacity: 0; transition: opacity 0.9s ease 0.15s;
+}
+.env-scene.ready { opacity: 1; }
 .env { position: absolute; inset: 0; transform-style: preserve-3d; }
 
 /* Kraft envelope base (pocket behind the card) */
@@ -118,15 +159,17 @@ body {
 .env.open .env__tri--right { transform: translateY(115%); }
 .env.open .env__tri--bottom { transform: translateY(115%); }
 
-/* Diagonal crease shadows (the envelope X) */
+/* Diagonal crease shadows — hidden until textures load, then subtle */
 .env__seams {
   position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  opacity: 0;
   background:
-    linear-gradient(to bottom right, transparent calc(50% - 1.5px), rgba(60,35,10,0.28) 50%, transparent calc(50% + 1.5px)),
-    linear-gradient(to bottom left, transparent calc(50% - 1.5px), rgba(60,35,10,0.28) 50%, transparent calc(50% + 1.5px)),
-    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.12) 0%, transparent 22%);
+    linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgba(60,35,10,0.14) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom left, transparent calc(50% - 0.5px), rgba(60,35,10,0.14) 50%, transparent calc(50% + 0.5px)),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.08) 0%, transparent 20%);
   transition: opacity 0.7s ease 0.7s;
 }
+.env.ready .env__seams { opacity: 1; }
 .env.open .env__seams { opacity: 0; }
 
 /* Letter/card that sits behind the envelope and is revealed as the flaps slide off */
@@ -387,11 +430,67 @@ body {
 }
 .reminder-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(201,168,76,0.55); }
 .reminder-btn--done { background: linear-gradient(135deg, #7fae7f, #a9d0a9); color: #143d14; }
-.reminder-google {
-  font-family: var(--font-body); font-size: 0.9rem; font-style: italic;
-  color: var(--burgundy); text-decoration: underline; text-underline-offset: 2px;
+.reminder-hint {
+  font-family: var(--font-serif); font-size: 0.62rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(107,29,58,0.65); text-align: center;
 }
-.reminder-google:hover { color: var(--gold); }
+
+/* Reminder picker modal */
+.reminder-modal {
+  position: fixed; inset: 0; z-index: 1300;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 1rem;
+}
+.reminder-modal.hidden { display: none; }
+.reminder-modal__backdrop {
+  position: absolute; inset: 0; background: rgba(15,5,8,0.72);
+  backdrop-filter: blur(4px);
+}
+.reminder-modal__panel {
+  position: relative; z-index: 1; width: min(100%, 420px);
+  padding: 1.5rem 1.25rem 1.25rem; border-radius: 14px 14px 10px 10px;
+  background: linear-gradient(160deg, #fffdf8 0%, #fbf3e4 100%);
+  border: 1px solid rgba(201,168,76,0.45);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+  animation: slideUpModal 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+@keyframes slideUpModal {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.reminder-modal__eyebrow {
+  font-family: var(--font-serif); font-size: 0.62rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold); text-align: center;
+}
+.reminder-modal__title {
+  font-family: var(--font-script); font-size: clamp(1.8rem, 7vw, 2.4rem);
+  color: var(--burgundy); text-align: center; margin: 0.25rem 0 0.75rem;
+}
+.reminder-modal__meta {
+  font-family: var(--font-body); font-size: 0.95rem; line-height: 1.55;
+  text-align: center; color: #555; margin-bottom: 1.1rem;
+}
+.reminder-modal__btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.55rem;
+  font-family: var(--font-serif); font-size: 0.72rem; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 0.85rem 1rem; margin-bottom: 0.55rem;
+  border: 1.5px solid rgba(201,168,76,0.5); border-radius: 6px;
+  background: #fff; color: var(--burgundy); cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.reminder-modal__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+.reminder-modal__btn--primary {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-shine) 50%, var(--gold) 100%);
+  border-color: transparent; color: var(--burgundy-deep); font-weight: 600;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.35);
+}
+.reminder-modal__btn-icon { font-size: 1.1rem; line-height: 1; }
+.reminder-modal__dismiss {
+  width: 100%; margin-top: 0.35rem; padding: 0.55rem;
+  font-family: var(--font-sans); font-size: 0.78rem; color: #888;
+  background: none; border: none; cursor: pointer;
+}
+.reminder-modal__dismiss:hover { color: var(--burgundy); }
 
 .invite-card__contacts { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.08); }
 .invite-card__contacts p { font-family: var(--font-serif); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem; color: #666; }

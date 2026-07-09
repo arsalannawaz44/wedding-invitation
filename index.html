@@ -3,7 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arsalan &amp; Tehreem — A Royal Wedding Invitation</title>
+  <title>Arsalan &amp; Tehreem — Wedding Invitation</title>
+  <meta name="description" content="You are cordially invited to celebrate the wedding of Arsalan &amp; Tehreem. Ceremony 19 July &amp; Valima 20 July 2026, Karachi." />
+
+  <!-- Open Graph / WhatsApp link preview — update og:url & og:image to your live HTTPS link -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Arsalan &amp; Tehreem — Wedding Invitation" />
+  <meta property="og:description" content="You're invited! Wedding Ceremony 19 July &amp; Valima Reception 20 July 2026 · Karachi. Tap to open your invitation." />
+  <meta property="og:image" content="https://arsalannawaz44.github.io/wedding-invitation/assets/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="800" />
+  <meta property="og:url" content="https://arsalannawaz44.github.io/wedding-invitation/" />
+  <meta property="og:site_name" content="Arsalan &amp; Tehreem Wedding" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Arsalan &amp; Tehreem — Wedding Invitation" />
+  <meta name="twitter:description" content="You're invited! Ceremony 19 July &amp; Valima 20 July 2026 · Karachi." />
+  <meta name="twitter:image" content="https://arsalannawaz44.github.io/wedding-invitation/assets/og-image.jpg" />
+  <link rel="icon" href="assets/monogram.png" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/monogram.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
@@ -28,6 +45,14 @@
   <!-- ===== Kraft Envelope Welcome ===== -->
   <div id="welcome" class="welcome">
     <canvas id="welcome-sparkles" class="welcome__sparkles"></canvas>
+
+    <!-- Glitter loader — shown until envelope textures are ready -->
+    <div id="env-loader" class="env-loader" aria-live="polite">
+      <div class="env-loader__mono"></div>
+      <p class="env-loader__text">Preparing your invitation</p>
+      <div class="env-loader__dots"><span></span><span></span><span></span></div>
+      <canvas id="loader-sparkles" class="env-loader__sparkles"></canvas>
+    </div>
 
     <div class="env-scene">
       <div class="env" id="env">
@@ -63,8 +88,27 @@
   <div id="reminder-toast" class="reminder-toast">
     <span class="reminder-toast__icon">🔔</span>
     <div>
-      <strong>Valima reminder added</strong>
-      <small>Check your downloads — opens in your calendar with a 7:00 PM, 20 July alert</small>
+      <strong id="reminder-toast-title">Valima reminder</strong>
+      <small id="reminder-toast-msg">Tap below to add to your calendar</small>
+    </div>
+  </div>
+
+  <!-- Calendar reminder picker (Android-friendly) -->
+  <div id="reminder-modal" class="reminder-modal hidden" role="dialog" aria-labelledby="reminder-modal-title" aria-modal="true">
+    <div class="reminder-modal__backdrop" id="reminder-modal-backdrop"></div>
+    <div class="reminder-modal__panel">
+      <p class="reminder-modal__eyebrow">Valima Reception</p>
+      <h3 id="reminder-modal-title" class="reminder-modal__title">Set a Reminder</h3>
+      <p class="reminder-modal__meta">Monday, 20 July 2026 · Iris Banquet, Karachi<br />Alert at <strong>7:00 PM</strong> · Gathering 9:00 PM</p>
+      <button type="button" class="reminder-modal__btn reminder-modal__btn--primary" id="reminder-google-btn">
+        <span class="reminder-modal__btn-icon">📅</span>
+        Add to Google Calendar
+      </button>
+      <button type="button" class="reminder-modal__btn" id="reminder-ics-btn">
+        <span class="reminder-modal__btn-icon">🍎</span>
+        Apple / Download .ics file
+      </button>
+      <button type="button" class="reminder-modal__dismiss" id="reminder-dismiss">Maybe later</button>
     </div>
   </div>
 
@@ -175,7 +219,7 @@
           </div>
           <div class="reminder-box">
             <button class="reminder-btn" id="valima-reminder">🔔 Set Valima Reminder — 7:00 PM, 20 July</button>
-            <a class="reminder-google" id="valima-google" target="_blank" rel="noopener">or add to Google Calendar</a>
+            <p class="reminder-hint" id="reminder-hint">Works on Android, iPhone &amp; desktop</p>
           </div>
           <div class="invite-card__contacts">
             <p>Awaiting to welcome: All Family Members</p>
