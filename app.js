@@ -130,8 +130,26 @@ const MUSIC_START_SEC = 0;
 
 const Music = (function () {
   const el = document.getElementById('bg-music');
+  const fireworksEl = document.getElementById('fireworks-sfx');
   let started = false;
   let usingFile = false;
+
+  function syncToggleUI() {
+    const btn = document.getElementById('sound-toggle');
+    if (!btn) return;
+    const on = isOn();
+    btn.classList.toggle('muted', !on);
+    btn.classList.toggle('playing', on);
+  }
+
+  function pauseAll() {
+    if (el) {
+      el.pause();
+    }
+    Sound.stopMusic();
+    if (fireworksEl) fireworksEl.pause();
+    syncToggleUI();
+  }
 
   function start() {
     if (started) return;
@@ -141,29 +159,42 @@ const Music = (function () {
       el.currentTime = MUSIC_START_SEC;
       const p = el.play();
       if (p && p.then) {
-        p.then(() => { usingFile = true; }).catch(() => { usingFile = false; Sound.startMusic(); });
+        p.then(() => { usingFile = true; syncToggleUI(); }).catch(() => { usingFile = false; Sound.startMusic(); syncToggleUI(); });
       } else {
         usingFile = true;
       }
     } else {
       Sound.startMusic();
     }
+    syncToggleUI();
   }
 
   function toggle() {
     if (!started) { start(); return true; }
     if (usingFile && el) {
-      if (el.paused) { el.play(); return true; }
-      el.pause(); return false;
+      if (el.paused) { el.play(); syncToggleUI(); return true; }
+      el.pause(); syncToggleUI(); return false;
     }
-    return Sound.toggleMusic();
+    const on = Sound.toggleMusic();
+    syncToggleUI();
+    return on;
   }
 
   function isOn() {
     return usingFile && el ? !el.paused : Sound.isOn();
   }
 
-  return { start, toggle, isOn };
+  function onPageHidden() {
+    pauseAll();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') onPageHidden();
+  });
+  window.addEventListener('pagehide', onPageHidden);
+  window.addEventListener('beforeunload', onPageHidden);
+
+  return { start, toggle, isOn, pauseAll };
 })();
 
 /* Sound toggle button */
