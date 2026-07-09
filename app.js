@@ -568,54 +568,32 @@ const Reminder = (function () {
 })();
 
 /* ===== Countdown ===== */
-const EVENTS = {
-  ceremony: {
-    date: new Date('2026-07-19T20:00:00+05:00'),
-    label: 'Sunday, 19th July 2026',
-    ids: { days: 'cd-days-c', hours: 'cd-hours-c', mins: 'cd-mins-c', secs: 'cd-secs-c' },
-  },
-  valima: {
-    date: new Date('2026-07-20T21:00:00+05:00'),
-    label: 'Monday, 20th July 2026',
-    ids: { days: 'cd-days-v', hours: 'cd-hours-v', mins: 'cd-mins-v', secs: 'cd-secs-v' },
-  },
+const VALIMA_EVENT = {
+  date: new Date('2026-07-20T21:00:00+05:00'),
+  label: 'Monday, 20th July 2026',
+  ids: { days: 'cd-days-v', hours: 'cd-hours-v', mins: 'cd-mins-v', secs: 'cd-secs-v' },
 };
 
 const pad = (n) => String(n).padStart(2, '0');
 
 function updateCountdown() {
   const now = new Date();
-  for (const key of Object.keys(EVENTS)) {
-    const ev = EVENTS[key];
-    const diff = ev.date - now;
-    let d = 0, h = 0, m = 0, s = 0;
-    if (diff > 0) {
-      d = Math.floor(diff / 86400000);
-      h = Math.floor((diff / 3600000) % 24);
-      m = Math.floor((diff / 60000) % 60);
-      s = Math.floor((diff / 1000) % 60);
-    }
-    document.getElementById(ev.ids.days).textContent = pad(d);
-    document.getElementById(ev.ids.hours).textContent = pad(h);
-    document.getElementById(ev.ids.mins).textContent = pad(m);
-    document.getElementById(ev.ids.secs).textContent = pad(s);
+  const ev = VALIMA_EVENT;
+  const diff = ev.date - now;
+  let d = 0, h = 0, m = 0, s = 0;
+  if (diff > 0) {
+    d = Math.floor(diff / 86400000);
+    h = Math.floor((diff / 3600000) % 24);
+    m = Math.floor((diff / 60000) % 60);
+    s = Math.floor((diff / 1000) % 60);
   }
+  document.getElementById(ev.ids.days).textContent = pad(d);
+  document.getElementById(ev.ids.hours).textContent = pad(h);
+  document.getElementById(ev.ids.mins).textContent = pad(m);
+  document.getElementById(ev.ids.secs).textContent = pad(s);
 }
 updateCountdown();
 setInterval(updateCountdown, 1000);
-
-const countdownTabs = document.querySelectorAll('.countdown-tab');
-const countdownDate = document.getElementById('countdown-date');
-countdownTabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    const target = tab.dataset.target;
-    countdownTabs.forEach((t) => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelectorAll('.countdown').forEach((cd) => cd.classList.remove('active'));
-    document.getElementById('countdown-' + target).classList.add('active');
-    countdownDate.textContent = EVENTS[target].label;
-  });
-});
 
 /* ===== Scratch Card ===== */
 let scratchInitialized = false;
