@@ -402,29 +402,31 @@ welcome.addEventListener('click', () => {
   window.addEventListener('resize', size);
 })();
 
-/* ===== Add-to-Calendar Reminder (Valima) ===== */
+/* ===== Add-to-Calendar Reminder ===== */
 const Reminder = (function () {
   const isAndroid = /Android/i.test(navigator.userAgent);
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+  // 16 Jan 2027, gathering 9:00 PM PKT (UTC+5). Reminder alarm at 7:00 PM PKT.
+  // PKT->UTC: 21:00 -> 16:00Z, 23:00 -> 18:00Z, 19:00 (alarm) -> 14:00Z
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Arsalan & Tehreem Wedding//Valima//EN',
+    'PRODID:-//Ammar & Haniya Reception//Invite//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    'UID:valima-arsalan-tehreem-20260720@wedding.invite',
-    'DTSTAMP:20260708T000000Z',
-    'DTSTART:20260720T160000Z',
-    'DTEND:20260720T180000Z',
-    'SUMMARY:Valima Reception — Arsalan & Tehreem',
-    'DESCRIPTION:Valima Reception of Arsalan & Tehreem.\\nGathering 9:00 PM\\, Dinner 10:00 PM.',
-    'LOCATION:Iris Banquet\\, D-2\\, Block-J\\, North Nazimabad\\, Karachi',
+    'UID:wedding-ammar-haniya-20270116@wedding.invite',
+    'DTSTAMP:20261030T000000Z',
+    'DTSTART:20270116T160000Z',
+    'DTEND:20270116T180000Z',
+    'SUMMARY:Reception — Ammar & Haniya',
+    'DESCRIPTION:Reception of Ammar & Haniya.\\nGathering 9:00 PM\\, Dinner 10:00 PM.',
+    'LOCATION:Elanora Marquee\\, Block 15 Gulistan-e-Johar\\, Karachi',
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
-    'DESCRIPTION:Valima Reception Reminder — Arsalan & Tehreem',
-    'TRIGGER;VALUE=DATE-TIME:20260720T140000Z',
+    'DESCRIPTION:Reception Reminder — Ammar & Haniya',
+    'TRIGGER;VALUE=DATE-TIME:20270116T140000Z',
     'END:VALARM',
     'END:VEVENT',
     'END:VCALENDAR',
@@ -441,10 +443,10 @@ const Reminder = (function () {
   function googleUrl() {
     const params = new URLSearchParams({
       action: 'TEMPLATE',
-      text: 'Valima Reception — Arsalan & Tehreem',
-      dates: '20260720T160000Z/20260720T180000Z',
-      details: 'Valima Reception of Arsalan & Tehreem. Gathering 9:00 PM, Dinner 10:00 PM. Reminder: arrive by 7:00 PM.',
-      location: 'Iris Banquet, D-2, Block-J, North Nazimabad, Karachi',
+      text: 'Reception — Ammar & Haniya',
+      dates: '20270116T160000Z/20270116T180000Z',
+      details: 'Reception of Ammar & Haniya. Gathering 9:00 PM, Dinner 10:00 PM. Reminder: arrive by 7:00 PM.',
+      location: 'Elanora Marquee, Block 15 Gulistan-e-Johar, Karachi',
     });
     return 'https://calendar.google.com/calendar/render?' + params.toString();
   }
@@ -453,7 +455,7 @@ const Reminder = (function () {
     window.open(googleUrl(), 'weddingExternalTab');
     showReminderToast(
       'Opening Google Calendar',
-      'Tap Save to add the Valima reminder (7:00 PM alert).'
+      'Tap Save to add the reception reminder (7:00 PM alert).'
     );
     Sound.sparkle();
     closeModal();
@@ -465,7 +467,7 @@ const Reminder = (function () {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Valima-Arsalan-Tehreem.ics';
+    a.download = 'Reception-Ammar-Haniya.ics';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -510,7 +512,7 @@ const Reminder = (function () {
       return;
     }
     showReminderToast(
-      'Don\u2019t miss the Valima',
+      'Don\u2019t miss the reception',
       'Tap the reminder button below to add it to your calendar.'
     );
   }
@@ -536,7 +538,7 @@ const Reminder = (function () {
         : 'Google Calendar or download .ics file';
   }
   if (mainBtn && isAndroid) {
-    mainBtn.innerHTML = '🔔 Add Valima to Google Calendar — 7:00 PM';
+    mainBtn.innerHTML = '🔔 Add to Google Calendar — 7:00 PM';
   }
 
   if (googleBtn) googleBtn.addEventListener('click', openGoogle);
@@ -569,8 +571,8 @@ const Reminder = (function () {
 
 /* ===== Countdown ===== */
 const VALIMA_EVENT = {
-  date: new Date('2026-07-20T21:00:00+05:00'),
-  label: 'Monday, 20th July 2026',
+  date: new Date('2027-01-16T21:00:00+05:00'),
+  label: 'Monday, 16th January 2027',
   ids: { days: 'cd-days-v', hours: 'cd-hours-v', mins: 'cd-mins-v', secs: 'cd-secs-v' },
 };
 
