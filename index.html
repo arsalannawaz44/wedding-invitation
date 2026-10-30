@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#3a0e1f" />
   <title>Ammar &amp; Haniya — Reception Invitation</title>
   <meta name="description" content="You are cordially invited to the reception of Ammar &amp; Haniya. Monday, 16 January 2027 · Elanora Marquee, Gulistan-e-Johar, Karachi." />
 
@@ -10,17 +11,16 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Ammar &amp; Haniya — Reception Invitation" />
   <meta property="og:description" content="You're invited! Monday, 16 January 2027 · Elanora Marquee, Gulistan-e-Johar, Karachi. Tap to open your invitation." />
-  <meta property="og:image" content="https://arsalannawaz44.github.io/wedding-invitation/assets/og-image.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="800" />
-  <meta property="og:url" content="https://arsalannawaz44.github.io/wedding-invitation/" />
+  <meta property="og:image" content="https://wedding-invitation-theta-neon.vercel.app/assets/og-image-ah.jpg" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="720" />
+  <meta property="og:url" content="https://wedding-invitation-theta-neon.vercel.app/" />
   <meta property="og:site_name" content="Ammar &amp; Haniya Reception" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ammar &amp; Haniya — Reception Invitation" />
   <meta name="twitter:description" content="You're invited! Monday, 16 January 2027 · Karachi." />
-  <meta name="twitter:image" content="https://arsalannawaz44.github.io/wedding-invitation/assets/og-image.jpg" />
-  <link rel="icon" href="assets/monogram.png" type="image/png" />
-  <link rel="apple-touch-icon" href="assets/monogram.png" />
+  <meta name="twitter:image" content="https://wedding-invitation-theta-neon.vercel.app/assets/og-image-ah.jpg" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%233a0e1f' stroke='%23c9a84c' stroke-width='3'/%3E%3Ctext x='32' y='41' font-family='Georgia,serif' font-size='24' fill='%23e8d5a3' text-anchor='middle'%3EAH%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
@@ -48,7 +48,7 @@
 
     <!-- Glitter loader — shown until envelope textures are ready -->
     <div id="env-loader" class="env-loader" aria-live="polite">
-      <div class="env-loader__mono"></div>
+      <div class="mono mono--light env-loader__mono" aria-hidden="true"><span>A</span><i>&amp;</i><span>H</span></div>
       <p class="env-loader__text">Preparing your invitation</p>
       <div class="env-loader__dots"><span></span><span></span><span></span></div>
       <canvas id="loader-sparkles" class="env-loader__sparkles"></canvas>
@@ -56,15 +56,16 @@
 
     <div class="env-scene">
       <div class="env" id="env">
-        <!-- Card that slides out -->
+        <!-- Card revealed behind the envelope -->
         <div class="env__card" id="env-card">
           <div class="env__card-corner env__card-corner--tl"></div>
           <div class="env__card-corner env__card-corner--br"></div>
+          <p class="env__card-guest guest-name hidden"></p>
           <p class="env__card-invited">You're Invited</p>
-          <div class="env__card-mono"></div>
+          <img class="crest env__card-mono" src="assets/monogram-ah.jpg" alt="" aria-hidden="true" />
           <h1 class="env__card-names">Ammar <em>&amp;</em> Haniya</h1>
           <div class="env__card-rule"><span>◆</span></div>
-          <p class="env__card-date">16 January 2027 · Karachi</p>
+          <p class="env__card-date">Reception · 16 January 2027 · Karachi</p>
         </div>
 
         <!-- Kraft envelope pocket + folds -->
@@ -84,8 +85,8 @@
     </div>
   </div>
 
-  <!-- Reminder toast -->
-  <div id="reminder-toast" class="reminder-toast">
+  <!-- Toast -->
+  <div id="reminder-toast" class="reminder-toast" role="status">
     <span class="reminder-toast__icon">🔔</span>
     <div>
       <strong id="reminder-toast-title">Reception reminder</strong>
@@ -115,12 +116,13 @@
   <!-- ===== Main content ===== -->
   <main id="main" class="main hidden">
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero" id="home">
       <div class="hero__corner hero__corner--tl"></div>
       <div class="hero__corner hero__corner--tr"></div>
       <div class="hero__corner hero__corner--bl"></div>
       <div class="hero__corner hero__corner--br"></div>
-      <div class="hero__monogram"></div>
+      <p class="hero__guest guest-name hidden"></p>
+      <img class="crest hero__monogram" src="assets/monogram-ah.jpg" alt="" aria-hidden="true" />
       <p class="hero__bismillah">In the Name of Allah, the Most Beneficent &amp; the Most Merciful</p>
       <h1 class="hero__couple">
         <span>Ammar</span>
@@ -129,6 +131,11 @@
       </h1>
       <div class="hero__divider"><span>◆</span></div>
       <p class="hero__tagline">Together with their families, request the honour of your presence &amp; blessings at the Reception</p>
+      <div class="hero__date-pill">
+        <span>Monday</span>
+        <strong>16</strong>
+        <span>January 2027</span>
+      </div>
       <div class="hero__scroll">
         <span>Scroll to explore</span>
         <div class="hero__scroll-icon"></div>
@@ -136,7 +143,8 @@
     </section>
 
     <!-- Countdown -->
-    <section class="countdown-section">
+    <section class="countdown-section reveal">
+      <p class="section-eyebrow section-eyebrow--light">Save the Date</p>
       <h2 class="section-title">Counting Down to the Reception</h2>
       <div id="countdown-valima" class="countdown active">
         <div class="countdown__unit"><span id="cd-days-v">00</span><small>Days</small></div>
@@ -148,11 +156,13 @@
     </section>
 
     <!-- Invitation -->
-    <section class="invitations">
+    <section class="invitations" id="details">
+      <p class="section-eyebrow">With Love</p>
       <h2 class="section-title">Reception Invitation</h2>
 
       <article class="invite-card invite-card--valima" id="valima">
         <div class="invite-card__corner invite-card__corner--tl"></div>
+        <div class="invite-card__corner invite-card__corner--br"></div>
         <div class="invite-card__inner">
           <p class="invite-card__hosts">Mr. &amp; Mrs. Kazim Jabri</p>
           <p class="invite-card__request">Request the honour of your presence &amp; blessings at the</p>
@@ -168,32 +178,132 @@
             <h4>Elanora Marquee</h4>
             <p>W4GG+4CJ, Block 15 Gulistan-e-Johar, Karachi</p>
           </div>
-          <div class="invite-card__schedule">
-            <div class="schedule-item">
-              <span class="schedule-icon">👥</span>
-              <div><small>Gathering</small><strong>09:00 PM</strong></div>
-            </div>
-            <div class="schedule-item">
-              <span class="schedule-icon">🍽️</span>
-              <div><small>Dinner</small><strong>10:00 PM</strong></div>
-            </div>
-          </div>
           <div class="reminder-box">
             <button class="reminder-btn" id="valima-reminder">🔔 Set Reminder — 7:00 PM, 16 January</button>
             <p class="reminder-hint" id="reminder-hint">Works on Android, iPhone &amp; desktop</p>
-          </div>
-          <div class="invite-card__contacts">
-            <p>RSVP</p>
-            <a href="tel:+923171119548">Kazim Jabri — 0317-1119548</a>
-            <a href="tel:+923351800067">Abdullah Moiz — 0335-1800067</a>
-            <a href="tel:+923219206084">Abdul Haseeb — 0321-9206084</a>
           </div>
         </div>
       </article>
     </section>
 
+    <!-- Evening timeline -->
+    <section class="timeline-section reveal" id="programme">
+      <p class="section-eyebrow">The Evening</p>
+      <h2 class="section-title">Programme</h2>
+      <ol class="timeline">
+        <li class="timeline__item">
+          <span class="timeline__dot">👥</span>
+          <div class="timeline__body">
+            <strong class="timeline__time">9:00 PM</strong>
+            <h3 class="timeline__title">Arrival of Guests</h3>
+            <p class="timeline__text">Join us as we welcome family &amp; friends</p>
+          </div>
+        </li>
+        <li class="timeline__item">
+          <span class="timeline__dot">🍽️</span>
+          <div class="timeline__body">
+            <strong class="timeline__time">10:00 PM</strong>
+            <h3 class="timeline__title">Dinner</h3>
+            <p class="timeline__text">An evening of food, warmth &amp; blessings</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Venue / Map -->
+    <section class="venue-section reveal" id="venue">
+      <p class="section-eyebrow">The Venue</p>
+      <h2 class="section-title">Find Your Way</h2>
+
+      <div class="venue-card">
+        <div class="venue-card__brand">
+          <h3>Elanora Marquee</h3>
+          <span class="venue-card__event-label">16 January 2027 · Gathering 9:00 PM</span>
+        </div>
+        <div class="venue-card__details">
+          <p>📍 W4GG+4CJ, Block 15 Gulistan-e-Johar, Karachi, Pakistan</p>
+          <button type="button" class="venue-card__copy" id="copy-address">Copy address</button>
+        </div>
+        <div class="venue-card__map">
+          <iframe
+            title="Elanora Marquee, Gulistan-e-Johar Karachi"
+            src="https://maps.google.com/maps?q=Elanora+Marquee+Block+15+Gulistan-e-Johar+Karachi&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%" height="300" style="border:0;" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <a class="venue-card__map-link" data-external
+             href="https://www.google.com/maps/search/?api=1&query=W4GG%2B4CJ+Block+15+Gulistan-e-Johar+Karachi"
+             aria-label="Open Elanora Marquee in Google Maps"></a>
+        </div>
+        <a class="venue-card__directions" data-external href="https://www.google.com/maps/dir/?api=1&destination=W4GG%2B4CJ+Block+15+Gulistan-e-Johar+Karachi">Get Directions →</a>
+      </div>
+    </section>
+
+    <!-- RSVP -->
+    <section class="rsvp-section reveal" id="rsvp">
+      <p class="section-eyebrow section-eyebrow--light">Kindly Respond</p>
+      <h2 class="section-title">RSVP</h2>
+      <p class="rsvp-section__hint">Let us know if you can join us — your reply is sent on WhatsApp</p>
+
+      <form class="rsvp-form" id="rsvp-form" novalidate>
+        <label class="rsvp-form__field">
+          <span>Your name</span>
+          <input type="text" id="rsvp-name" name="name" autocomplete="name" placeholder="e.g. Ali Raza &amp; Family" required />
+        </label>
+
+        <fieldset class="rsvp-form__choice">
+          <legend>Will you attend?</legend>
+          <label><input type="radio" name="attending" value="yes" checked /><span>Joyfully attending</span></label>
+          <label><input type="radio" name="attending" value="no" /><span>Regretfully decline</span></label>
+        </fieldset>
+
+        <label class="rsvp-form__field" id="rsvp-guests-field">
+          <span>Number of guests</span>
+          <select id="rsvp-guests" name="guests">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8+</option>
+          </select>
+        </label>
+
+        <label class="rsvp-form__field">
+          <span>Wishes &amp; duas for the couple <em>(optional)</em></span>
+          <textarea id="rsvp-message" name="message" rows="3" placeholder="Write a message for Ammar &amp; Haniya"></textarea>
+        </label>
+
+        <p class="rsvp-form__error hidden" id="rsvp-error">Please enter your name.</p>
+        <button type="submit" class="rsvp-form__submit">Send RSVP on WhatsApp</button>
+      </form>
+
+      <div class="rsvp-contacts">
+        <p>Or contact directly</p>
+        <ul>
+          <li>
+            <span>Kazim Jabri</span>
+            <a href="tel:+923171119548" aria-label="Call Kazim Jabri">📞</a>
+            <a data-external href="https://wa.me/923171119548" aria-label="WhatsApp Kazim Jabri">💬</a>
+          </li>
+          <li>
+            <span>Abdullah Moiz</span>
+            <a href="tel:+923351800067" aria-label="Call Abdullah Moiz">📞</a>
+            <a data-external href="https://wa.me/923351800067" aria-label="WhatsApp Abdullah Moiz">💬</a>
+          </li>
+          <li>
+            <span>Abdul Haseeb</span>
+            <a href="tel:+923219206084" aria-label="Call Abdul Haseeb">📞</a>
+            <a data-external href="https://wa.me/923219206084" aria-label="WhatsApp Abdul Haseeb">💬</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
     <!-- Scratch card surprise -->
-    <section class="scratch-section">
+    <section class="scratch-section reveal">
+      <p class="section-eyebrow">For You</p>
       <h2 class="section-title">A Little Surprise</h2>
       <p class="scratch-section__hint">Scratch the golden card to reveal a special blessing for the couple</p>
       <div class="scratch-wrapper">
@@ -210,45 +320,29 @@
       </div>
     </section>
 
-    <!-- Venue / Map -->
-    <section class="venue-section">
-      <h2 class="section-title">Find Your Way</h2>
-
-      <div class="venue-card">
-        <div class="venue-card__brand venue-card__brand--iris">
-          <h3>Elanora Marquee</h3>
-          <span class="venue-card__tagline">Reception</span>
-          <span class="venue-card__event-label">16 January 2027 · Gathering 9:00 PM</span>
-        </div>
-        <div class="venue-card__details">
-          <p>📍 W4GG+4CJ, Block 15 Gulistan-e-Johar, Karachi, Pakistan</p>
-        </div>
-        <div class="venue-card__map">
-          <iframe
-            title="Elanora Marquee, Gulistan-e-Johar Karachi"
-            src="https://maps.google.com/maps?q=Elanora+Marquee+Block+15+Gulistan-e-Johar+Karachi&t=&z=16&ie=UTF8&iwloc=&output=embed"
-            width="100%" height="300" style="border:0;" loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <a class="venue-card__map-link" data-external
-             href="https://www.google.com/maps/search/?api=1&query=W4GG%2B4CJ+Block+15+Gulistan-e-Johar+Karachi"
-             aria-label="Open Elanora Marquee in Google Maps"></a>
-        </div>
-        <a class="venue-card__directions" data-external href="https://www.google.com/maps/dir/?api=1&destination=W4GG%2B4CJ+Block+15+Gulistan-e-Johar+Karachi">Get Directions →</a>
-      </div>
-    </section>
-
     <!-- Finale -->
     <footer class="footer" id="finale">
       <canvas id="fireworks" class="fireworks-canvas"></canvas>
       <div class="footer__inner">
-        <div class="footer__monogram"></div>
+        <div class="mono mono--light footer__monogram" aria-hidden="true"><span>A</span><i>&amp;</i><span>H</span></div>
         <p class="footer__names">Ammar <em>&amp;</em> Haniya</p>
         <p class="footer__date">16 January 2027 · Karachi</p>
         <p class="footer__dua">May Allah bless this union with love, mercy &amp; barakah</p>
-        <button id="celebrate-btn" class="celebrate-btn">Celebrate with us ✨</button>
+        <div class="footer__actions">
+          <button id="celebrate-btn" class="celebrate-btn">Celebrate with us ✨</button>
+          <button type="button" class="share-btn" data-share>Share invitation</button>
+        </div>
       </div>
     </footer>
   </main>
+
+  <!-- Quick navigation (mobile-first) -->
+  <nav class="quick-nav hidden" id="quick-nav" aria-label="Quick navigation">
+    <a href="#details"><span>💌</span>Invite</a>
+    <a href="#venue"><span>📍</span>Venue</a>
+    <a href="#rsvp"><span>✉️</span>RSVP</a>
+    <button type="button" data-share><span>🔗</span>Share</button>
+  </nav>
 
   <script src="app.js"></script>
 </body>

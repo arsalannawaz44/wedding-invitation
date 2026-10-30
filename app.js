@@ -236,15 +236,19 @@ function openEnvelope() {
   setTimeout(enterInvitation, 3600);
 }
 
-function showReminderToast(title, message) {
+let toastTimer = null;
+function showReminderToast(title, message, icon) {
   const toast = document.getElementById('reminder-toast');
   const titleEl = document.getElementById('reminder-toast-title');
   const msgEl = document.getElementById('reminder-toast-msg');
+  const iconEl = toast && toast.querySelector('.reminder-toast__icon');
   if (!toast) return;
   if (titleEl) titleEl.textContent = title;
   if (msgEl) msgEl.textContent = message;
+  if (iconEl) iconEl.textContent = icon || '🔔';
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 6000);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 6000);
 }
 
 function enterInvitation() {
@@ -252,6 +256,7 @@ function enterInvitation() {
   entered = true;
   Sound.chime();
   main.classList.remove('hidden');
+  document.getElementById('quick-nav').classList.remove('hidden');
   welcome.classList.add('done');
   initScratchCard();
   setTimeout(() => { welcome.style.display = 'none'; }, 1100);
@@ -267,8 +272,8 @@ welcome.addEventListener('click', () => {
   const ASSETS = [
     'assets/kraft-paper.png',
     'assets/wax-love.png',
-    'assets/monogram.png',
     'assets/gold-corner.png',
+    'assets/monogram-ah.jpg',
   ];
   const loader = document.getElementById('env-loader');
   const scene = document.querySelector('.env-scene');
@@ -696,7 +701,7 @@ function initScratchCard() {
   window.addEventListener('resize', resize);
 }
 
-/* ===== Scroll reveal for cards ===== */
+/* ===== Scroll reveal for cards & sections ===== */
 const cardObserver = new IntersectionObserver(
   (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.style.animationPlayState = 'running'; }),
   { threshold: 0.15 }
@@ -705,6 +710,140 @@ document.querySelectorAll('.invite-card').forEach((card) => {
   card.style.animationPlayState = 'paused';
   cardObserver.observe(card);
 });
+
+const revealObserver = new IntersectionObserver(
+  (entries) => entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      revealObserver.unobserve(e.target);
+    }
+  }),
+  { threshold: 0.12 }
+);
+document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+/* ===== Personalised guest name (?to=Ali%20Raza) ===== */
+const guestName = (function () {
+  const raw = new URLSearchParams(window.location.search).get('to');
+  const name = raw ? raw.trim().slice(0, 60) : '';
+  if (!name) return '';
+  document.querySelectorAll('.guest-name').forEach((el) => {
+    el.classList.remove('hidden');
+    if (el.classList.contains('hero__guest')) {
+      el.textContent = 'Dear ';
+      const strong = document.createElement('strong');
+      strong.textContent = name;
+      el.appendChild(strong);
+    } else {
+      el.textContent = 'Dear ' + name;
+    }
+  });
+  const rsvpName = document.getElementById('rsvp-name');
+  if (rsvpName) rsvpName.value = name;
+  return name;
+})();
+
+/* ===== RSVP via WhatsApp ===== */
+(function rsvp() {
+  const RSVP_NUMBER = '923171119548';
+  const form = document.getElementById('rsvp-form');
+  if (!form) return;
+  const nameInput = document.getElementById('rsvp-name');
+  const guestsField = document.getElementById('rsvp-guests-field');
+  const guestsSelect = document.getElementById('rsvp-guests');
+  const messageInput = document.getElementById('rsvp-message');
+  const error = document.getElementById('rsvp-error');
+
+  form.querySelectorAll('input[name="attending"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      guestsField.classList.toggle('hidden', form.attending.value !== 'yes');
+    });
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    if (!name) {
+      error.classList.remove('hidden');
+      nameInput.focus();
+      return;
+    }
+    error.classList.add('hidden');
+
+    const attending = form.attending.value === 'yes';
+    const guests = guestsSelect.options[guestsSelect.selectedIndex].text;
+    const lines = [
+      'Assalam-o-Alaikum! RSVP for the Reception of Ammar & Haniya (16 Jan 2027):',
+      '',
+      'Name: ' + name,
+      attending ? 'Attending: Yes, InshaAllah' : 'Attending: Sorry, we can\u2019t make it',
+    ];
+    if (attending) lines.push('Guests: ' + guests);
+    const message = messageInput.value.trim();
+    if (message) lines.push('', 'Wishes: ' + message);
+
+    const url = 'https://wa.me/' + RSVP_NUMBER + '?text=' + encodeURIComponent(lines.join('\n'));
+    window.open(url, 'weddingExternalTab');
+    Sound.sparkle();
+    showReminderToast('Opening WhatsApp', 'Tap send to deliver your RSVP. Thank you!', '💌');
+  });
+})();
+
+/* ===== Share invitation ===== */
+(function share() {
+  const shareUrl = window.location.origin + window.location.pathname;
+  const shareText = 'You\u2019re invited to the Reception of Ammar & Haniya — Monday, 16 January 2027, Elanora Marquee, Karachi.';
+
+  async function doShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Ammar & Haniya — Reception', text: shareText, url: shareUrl });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    window.open('https://wa.me/?text=' + encodeURIComponent(shareText + '\n' + shareUrl), 'weddingExternalTab');
+  }
+
+  document.querySelectorAll('[data-share]').forEach((btn) => btn.addEventListener('click', doShare));
+})();
+
+/* ===== Copy venue address ===== */
+(function copyAddress() {
+  const btn = document.getElementById('copy-address');
+  if (!btn) return;
+  const address = 'Elanora Marquee, W4GG+4CJ, Block 15 Gulistan-e-Johar, Karachi, Pakistan';
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+    } catch (err) {
+      const ta = document.createElement('textarea');
+      ta.value = address;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = '✓ Copied';
+    showReminderToast('Address copied', 'Paste it into Careem, Uber or Maps.', '📍');
+    setTimeout(() => { btn.textContent = 'Copy address'; }, 2500);
+  });
+})();
+
+/* ===== Quick nav: highlight current section ===== */
+(function quickNav() {
+  const links = document.querySelectorAll('.quick-nav a');
+  const sections = [...links].map((a) => document.querySelector(a.getAttribute('href')));
+  const observer = new IntersectionObserver(
+    (entries) => entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }),
+    { rootMargin: '-45% 0px -45% 0px' }
+  );
+  sections.forEach((s) => s && observer.observe(s));
+})();
 
 /* ===== Fireworks Finale ===== */
 const fireworks = (function () {
